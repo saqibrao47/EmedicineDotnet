@@ -1,0 +1,35 @@
+# Visual Studio cache/options
+.vs/
+
+# Build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# ReSharper
+.idea/
+*.sln.iml
+
+# Local database files
+*.mdf
+*.ldf
+
+# NuGet
+packages/
+.nuget/
+
+# Environment files
+.env
+.env.local
