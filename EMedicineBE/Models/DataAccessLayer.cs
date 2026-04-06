@@ -207,5 +207,77 @@ namespace EMedicineBE.Models
             return response;
 
         }
+
+        public Response addUpdateMedicine(Medicines medicines, SqlConnection connection)
+        {
+            Response response = new Response();
+            SqlCommand cmd = new SqlCommand("sp_addUpdateMedicine", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ID", medicines.ID);
+            cmd.Parameters.AddWithValue("@Name", medicines.Name);
+            cmd.Parameters.AddWithValue("@Description", medicines.Description);
+            cmd.Parameters.AddWithValue("@Manufacturer", medicines.Manufacturer);
+            cmd.Parameters.AddWithValue("@Price", medicines.UnitPrice);
+            cmd.Parameters.AddWithValue("@Discount", medicines.Discount);
+            cmd.Parameters.AddWithValue("@Quantity", medicines.Quantity);
+            cmd.Parameters.AddWithValue("@ExpDate", medicines.ExpDate);
+            cmd.Parameters.AddWithValue("@ImageUrl", medicines.ImageUrl);
+            cmd.Parameters.AddWithValue("@Status", medicines.Status);
+            cmd.Parameters.AddWithValue("@Type", medicines.Type);
+
+            connection.Open();
+            int i = cmd.ExecuteNonQuery();
+            connection.Close();
+            if (i > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Medicine added/updated successfully";
+            }
+            else
+            {
+                response.StatusCode = 500;
+                response.StatusMessage = "Failed to add/update medicine";
+            }
+            return response;
+        }
+
+        public Response userList(Users users, SqlConnection connection)
+        {
+            SqlDataAdapter da = new SqlDataAdapter("sp_userList", connection);
+            da.SelectCommand.CommandType = CommandType.StoredProcedure;
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            Response response = new Response();
+            List<Users> listUsers = new List<Users>();
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    Users user = new Users
+                    {
+                        ID = Convert.ToInt32(row["ID"]),
+                        FirstName = Convert.ToString(row["FirstName"]),
+                        LastName = Convert.ToString(row["LastName"]),
+                        Email = Convert.ToString(row["Email"]),
+                        Password = Convert.ToString(row["Password"]),
+                        Type = Convert.ToString(row["Type"]),
+                        Status = Convert.ToInt32(row["Status"]),
+                        Fund = Convert.ToDecimal(row["Fund"]),
+                        CreatedOn = Convert.ToDateTime(row["CreatedOn"])
+                    };
+                    listUsers.Add(user);
+                }
+                response.StatusCode = 200;
+                response.StatusMessage = "Users retrieved successfully";
+                response.listUsers = listUsers;
+            }
+            else
+            {
+                response.StatusCode = 404;
+                response.StatusMessage = "No users found";
+                response.listUsers = null;
+            }
+            return response;
+        }
     }
 }
