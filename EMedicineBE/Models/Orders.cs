@@ -5,9 +5,9 @@
         public int ID { get; set; }
         public int UserID { get; set; }
         public string OrderNo { get; set; }
-        public decimal TotalAmount { get; set; }
+        public decimal OrderTotal { get; set; }
         //public DateTime OrderDate { get; set; }
 
-        public int Status { get; set; }
+        public int OrderStatus { get; set; }
     }
 }

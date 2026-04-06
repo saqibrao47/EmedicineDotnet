@@ -84,7 +84,7 @@ namespace EMedicineBE.Models
                 response.StatusCode = 200;
                 response.StatusMessage = "Users retrieved successfully";
                 // Optionally populate response.UsersList from dt here if you need
-               }
+            }
             else
             {
                 response.StatusCode = 404;
@@ -121,7 +121,7 @@ namespace EMedicineBE.Models
         }
 
 
-        public Response addToCart (Cart cart, SqlConnection connection)
+        public Response addToCart(Cart cart, SqlConnection connection)
         {
             Response response = new Response();
             SqlCommand cmd = new SqlCommand("sp_addToCart", connection);
@@ -147,4 +147,65 @@ namespace EMedicineBE.Models
             }
             return response;
         }
+
+        public Response placeOrder(Users users, SqlConnection connection)
+        {
+            Response response = new Response();
+            SqlCommand cmd = new SqlCommand("sp_placeOrder", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ID", users.ID);
+            connection.Open();
+            int i = cmd.ExecuteNonQuery();
+            connection.Close();
+            if (i > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Order placed successfully";
+            }
+            else
+            {
+                response.StatusCode = 500;
+                response.StatusMessage = "Failed to place order";
+            }
+            return response;
+        }
+
+        public Response orderList(Users users, SqlConnection connection)
+        {
+            SqlDataAdapter da = new SqlDataAdapter("sp_orderList", connection);
+            da.SelectCommand.CommandType = CommandType.StoredProcedure;
+            da.SelectCommand.Parameters.AddWithValue("@ID", users.ID);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            Response response = new Response();
+            List<Orders> ordersList = new List<Orders>();
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    Orders order = new Orders
+                    {
+                        ID = Convert.ToInt32(row["ID"]),
+                        UserID = Convert.ToInt32(row["UserID"]),
+                        OrderTotal = Convert.ToDecimal(row["OrderTotal"]),
+                        OrderNo = Convert.ToString(row["OrderNo"]),
+                        OrderStatus = Convert.ToInt32(row["OrderStatus"]),
+
+                    };
+                    ordersList.Add(order);
+                }
+                response.StatusCode = 200;
+                response.StatusMessage = "Orders retrieved successfully";
+                response.listOrders = ordersList;
+            }
+            else
+            {
+                response.StatusCode = 404;
+                response.StatusMessage = "No orders found";
+                response.listOrders = null;
+            }
+            return response;
+
+        }
+    }
 }
