@@ -241,7 +241,7 @@ namespace EMedicineBE.Models
             return response;
         }
 
-        public Response userList(Users users, SqlConnection connection)
+        public Response userList(SqlConnection connection)
         {
             SqlDataAdapter da = new SqlDataAdapter("sp_userList", connection);
             da.SelectCommand.CommandType = CommandType.StoredProcedure;
